@@ -1,5 +1,6 @@
 import { Worker, NEAR, NearAccount } from "near-workspaces";
 import anyTest, { TestFn } from "ava";
+import { arrayify } from "ethers/lib/utils";
 
 const test = anyTest as TestFn<{
   worker: Worker;
@@ -34,28 +35,44 @@ test.afterEach(async (t) => {
   });
 });
 
-test("can be incremented", async (t) => {
+test("can set oracle value", async (t) => {
   const { alice, contract } = t.context.accounts;
-  const startCounter: number = await contract.view("get_num", {});
-  await alice.call(contract, "increment", {});
-  const endCounter = await contract.view("get_num", {});
-  t.is(endCounter, startCounter + 1);
+
+  const oraclevalueBefore = await contract.view("get_oracle_value", {});
+  console.log({ oraclevalueBefore });
+  t.is(oraclevalueBefore, 0);
+
+  await alice.call(contract, "set_oracle_value", {
+    redstone_payload: arrayify("0x1234"),
+  });
+
+  const oraclevalueAfter = await contract.view("get_oracle_value", {});
+  console.log({ oraclevalueAfter });
+  t.is(oraclevalueAfter, 42);
 });
 
-test("can be decremented", async (t) => {
-  const { alice, contract } = t.context.accounts;
-  await alice.call(contract, "increment", {});
-  const startCounter: number = await contract.view("get_num", {});
-  await alice.call(contract, "decrement", {});
-  const endCounter = await contract.view("get_num", {});
-  t.is(endCounter, startCounter - 1);
-});
+// test("can be incremented", async (t) => {
+//   const { alice, contract } = t.context.accounts;
+//   const startCounter: number = await contract.view("get_num", {});
+//   await alice.call(contract, "increment", {});
+//   const endCounter = await contract.view("get_num", {});
+//   t.is(endCounter, startCounter + 1);
+// });
 
-test("can be reset", async (t) => {
-  const { alice, contract } = t.context.accounts;
-  await alice.call(contract, "increment", {});
-  await alice.call(contract, "increment", {});
-  await alice.call(contract, "reset", {});
-  const endCounter = await contract.view("get_num", {});
-  t.is(endCounter, 0);
-});
+// test("can be decremented", async (t) => {
+//   const { alice, contract } = t.context.accounts;
+//   await alice.call(contract, "increment", {});
+//   const startCounter: number = await contract.view("get_num", {});
+//   await alice.call(contract, "decrement", {});
+//   const endCounter = await contract.view("get_num", {});
+//   t.is(endCounter, startCounter - 1);
+// });
+
+// test("can be reset", async (t) => {
+//   const { alice, contract } = t.context.accounts;
+//   await alice.call(contract, "increment", {});
+//   await alice.call(contract, "increment", {});
+//   await alice.call(contract, "reset", {});
+//   const endCounter = await contract.view("get_num", {});
+//   t.is(endCounter, 0);
+// });
