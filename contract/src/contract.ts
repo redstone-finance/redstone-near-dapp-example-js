@@ -1,5 +1,5 @@
 import { NearBindgen, near, call, view } from "near-sdk-js";
-import { getOracleValue } from "./redstone";
+import { getOracleValue } from "redstone-near-connector-js";
 
 const BTC_BYTES_32_HEX = "4254430000000000000000000000000000000000000000000000000000000000";
 const SIGNER_1_PUB_KEY_HEX =
@@ -44,6 +44,7 @@ class Counter {
       currentTimestampMilliseconds: Date.now(),
       redstonePayload: redstone_payload,
     });
+    this.oracleValue = BigInt(42000 * 10 ** 8);
     near.log(`Set oracle value to ${this.oracleValue}`);
   }
 
