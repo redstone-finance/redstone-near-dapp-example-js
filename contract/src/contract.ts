@@ -1,13 +1,11 @@
 import { NearBindgen, near, call, view } from "near-sdk-js";
-import { fromHexString, getOracleValue } from "./redstone";
-import { AccountId } from "near-sdk-js/lib/types";
+import { getOracleValue } from "./redstone";
 
-const BTC_BYTES_32_HEX_STR =
-  "4254430000000000000000000000000000000000000000000000000000000000";
-const SIGNER_1_PUB_KEY =
-  "034f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa";
-const SIGNER_2_PUB_KEY =
-  "02466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27";
+const BTC_BYTES_32_HEX = "4254430000000000000000000000000000000000000000000000000000000000";
+const SIGNER_1_PUB_KEY_HEX =
+  "466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f276728176c3c6431f8eeda4538dc37c865e2784f3a9e77d044f33e407797e1278a";
+const SIGNER_2_PUB_KEY_HEX =
+  "4f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa385b6b1b8ead809ca67454d9683fcf2ba03456d6fe2c4abe2b07f0fbdbb2f1c1";
 
 @NearBindgen({})
 class Counter {
@@ -40,12 +38,9 @@ class Counter {
   set_oracle_value({ redstone_payload }: { redstone_payload: Uint8Array }) {
     near.log(`First byte: ${redstone_payload[0]}`);
     this.oracleValue = getOracleValue({
-      dataFeedId: fromHexString(BTC_BYTES_32_HEX_STR),
+      dataFeedId: BTC_BYTES_32_HEX,
       uniqueSignersThreshold: 2,
-      authorisedSigners: [
-        fromHexString(SIGNER_1_PUB_KEY),
-        fromHexString(SIGNER_2_PUB_KEY),
-      ],
+      authorisedSigners: [SIGNER_1_PUB_KEY_HEX, SIGNER_2_PUB_KEY_HEX],
       currentTimestampMilliseconds: Date.now(),
       redstonePayload: redstone_payload,
     });
