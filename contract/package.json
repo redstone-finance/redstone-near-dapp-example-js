@@ -12,7 +12,7 @@
     "lodash": "^4.17.21",
     "near-cli": "^3.4.0",
     "near-sdk-js": "0.6.0",
-    "redstone-near-connector-js": "^0.0.6",
+    "redstone-near-connector-js": "^0.0.7",
     "smallest": "^1.0.1"
   },
   "devDependencies": {

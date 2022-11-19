@@ -43,6 +43,8 @@ class Counter {
       authorisedSigners: [SIGNER_1_PUB_KEY_HEX, SIGNER_2_PUB_KEY_HEX],
       currentTimestampMilliseconds: Date.now(),
       redstonePayload: redstone_payload,
+      keccak256: near.keccak256,
+      ecrecover: near.ecrecover,
     });
     this.oracleValue = BigInt(42000 * 10 ** 8);
     near.log(`Set oracle value to ${this.oracleValue}`);
