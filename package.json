@@ -1,5 +1,5 @@
 {
-  "name": "counter-js",
+  "name": "redstone-near-dapp-example-js",
   "version": "1.0.0",
   "license": "(MIT AND Apache-2.0)",
   "scripts": {
@@ -10,8 +10,7 @@
     "build:contract": "cd contract && npm run build",
     "test": "npm run build:contract && npm run test:unit && npm run test:integration",
     "test:unit": "cd contract && npm test",
-    "test:integration": "cd integration-tests && npm test -- -- \"./contract/build/contract.wasm\"",
-    "postinstall": "cd frontend && npm install && cd .. && cd integration-tests && npm install && cd .. && cd contract && npm install"
+    "test:integration": "cd integration-tests && npm test -- -- \"./contract/build/contract.wasm\""
   },
   "devDependencies": {
     "near-cli": "^3.3.0"
