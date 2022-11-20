@@ -51,10 +51,6 @@ h1 {
   margin: auto;
 }
 
-.table {
-  maw-width: 800px;
-}
-
 #github-link {
   position: fixed;
   bottom: 50px;
@@ -69,4 +65,5 @@ h1 {
 .sign-out {
   text-align: center;
   margin: auto;
+  margin-bottom: 50px;
 }
