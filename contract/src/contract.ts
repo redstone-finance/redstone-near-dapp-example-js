@@ -1,58 +1,51 @@
 import { NearBindgen, near, call, view } from "near-sdk-js";
 import { getOracleValue } from "redstone-near-connector-js";
 
-const BTC_BYTES_32_HEX = "4254430000000000000000000000000000000000000000000000000000000000";
-const SIGNER_1_PUB_KEY_HEX =
-  "466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f276728176c3c6431f8eeda4538dc37c865e2784f3a9e77d044f33e407797e1278a";
-const SIGNER_2_PUB_KEY_HEX =
-  "4f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa385b6b1b8ead809ca67454d9683fcf2ba03456d6fe2c4abe2b07f0fbdbb2f1c1";
+const REDSTONE_MAIN_DEMO_SIGNER_PUB_KEY_HEX =
+  "009dd87eb41d96ce8ad94aa22ea8b0ba4ac20c45e42f71726d6b180f93c3f298e333ae7591fe1c9d88234575639be9e81e35ba2fe5ad2c2260f07db49ccb9d0d";
+
+// TODO: implement
+function convertToBytes32(symbol: string): string {
+  // return symbol;
+  return "4254430000000000000000000000000000000000000000000000000000000000";
+}
+
+function getOracleValueForSymbol(symbol: string, redstonePayload: Uint8Array): bigint {
+  const dataFeedId = convertToBytes32(symbol);
+  return getOracleValue({
+    dataFeedId,
+    uniqueSignersThreshold: 1,
+    authorisedSigners: [REDSTONE_MAIN_DEMO_SIGNER_PUB_KEY_HEX],
+    currentTimestampMilliseconds: Number(near.blockTimestamp() / BigInt(1_000_000)),
+    redstonePayload,
+    keccak256: near.keccak256,
+    ecrecover: near.ecrecover,
+  });
+}
 
 @NearBindgen({})
-class Counter {
-  val: number = 0;
-  oracleValue: bigint = BigInt(0);
-
-  @view({}) // Public read-only method: Returns the counter value.
-  get_num(): number {
-    return this.val;
+class RedstoneExample {
+  @view({}) // Public read-only method: Returns the extracted and verified oracle value
+  get_oracle_value({
+    redstone_payload,
+    symbol,
+  }: {
+    redstone_payload: Uint8Array;
+    symbol: string;
+  }): bigint {
+    return getOracleValueForSymbol(symbol, redstone_payload);
   }
 
-  @view({}) // Public read-only method: Returns the saved oracle value.
-  get_oracle_value(): bigint {
-    return this.oracleValue;
-  }
-
-  @call({}) // Public method: Increment the counter.
-  increment() {
-    this.val += 1;
-    near.log(`Increased number to ${this.val}`);
-  }
-
-  @call({}) // Public method: Decrement the counter.
-  decrement() {
-    this.val -= 1;
-    near.log(`Decreased number to ${this.val}`);
-  }
-
-  @call({}) // Public method: Set the oracle value
-  set_oracle_value({ redstone_payload }: { redstone_payload: Uint8Array }) {
-    near.log(`First byte: ${redstone_payload[0]}`);
-    this.oracleValue = getOracleValue({
-      dataFeedId: BTC_BYTES_32_HEX,
-      uniqueSignersThreshold: 2,
-      authorisedSigners: [SIGNER_1_PUB_KEY_HEX, SIGNER_2_PUB_KEY_HEX],
-      currentTimestampMilliseconds: Date.now(),
-      redstonePayload: redstone_payload,
-      keccak256: near.keccak256,
-      ecrecover: near.ecrecover,
-    });
-    this.oracleValue = BigInt(42000 * 10 ** 8);
-    near.log(`Set oracle value to ${this.oracleValue}`);
-  }
-
-  @call({}) // Public method - Reset to zero.
-  reset() {
-    this.val = 0;
-    near.log(`Reset counter to zero`);
+  @call({}) // Public method
+  do_something_with_oracle_value({
+    symbol,
+    redstone_payload,
+  }: {
+    redstone_payload: Uint8Array;
+    symbol: string;
+  }) {
+    const oracleValue = getOracleValueForSymbol(symbol, redstone_payload);
+    near.log(`Got oracle value: ${oracleValue}`);
+    // ... add your code here
   }
 }
