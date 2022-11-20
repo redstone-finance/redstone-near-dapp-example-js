@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RedStone dApp on NEAR</title>
   <link rel="icon" href="assets/favicon.ico"/>
   <link rel="apple-touch-icon" href="assets/favicon.ico"/>
   <link rel="stylesheet" href="./assets/global.css">
@@ -10,69 +11,77 @@
   <link href="https://fonts.googleapis.com/css?family=Arvo&display=swap" rel="stylesheet">
 
 </head>
-<body style="background: #eef2fe; font-family: 'Arvo', serif;">
+<body style="font-family: 'Arvo', serif;">
   <div class="container">
-    <h1>This counter lives in the NEAR blockchain!</h1>
+    <div id="oracle-image">
+      <img src="assets/oracle-image.png" alt="oracle image" />
+    </div>
+
+    <h1>RedStone dApp on NEAR</h1>
 
     <div class="scene">
-      <div class="gameboy">
-        <div class="body-shape shadow"></div>
-        <div class="body-shape side"></div>
-        <div class="body-shape front">
-          <div class="screen">
-            <div class="dot"></div>
-            <div class="face">
-              <div class="eyes-row">
-                <div id="left" class="closed">
-                  <div class="pupil"></div>
-                </div>
-                <div id="right" class="closed">
-                  <div class="pupil"></div>
-                </div>
-              </div>
-              <div class="mouth-row">
-                <div class="mouth smile"></div>
-                <div class="tongue"></div>
-              </div>
-            </div>
-            <div id="show" class="number"></div>
-          </div>
-          <div class="buttons">
-            <div class="row">
-              <button id="plus" class="interact arrows">
-                <div class="left">
-                </div>
-                <div class="updown">
-                </div>
-              </button>
-              <button id="minus" class="interact arrows">
-                <div class="right">
-                </div>
-              </button>
-            </div>
-            <div class="selects row">
-              <div class="ab">
-                <button id="a" class="interact r a">RS</button>
-                <button id="oracle-set" class="interact r b">ORACLE</button>
-                <!-- <button id="b" class="r b">LE</button> -->
-                <button id="c" class="r c">RE</button>
-                <button id="d" class="r d">L</button>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div id="integrated-contract-container">
+        Integrated contract:
+        <a href="#" target="_blank" id="integrated-contract-link"></a>
+      </div>
+      <div id="oracle-button-container" class="wallet-required" style="display: none;">
+        <button id="oracle-button" class="btn btn-primary">Get Oracle Data securely from NEAR contract</button>
+      </div>
+      <div id="status-msg-container"></div>
+      <div id="loader" style="display: none;">
+        <img src="assets/circle-loader.svg" alt="circle loader" />
+      </div>
+      <div id="prices-container" style="display: none; width: 800px">
+        <table class="table" id="prices-table">
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>NEAR</td>
+              <td id="NEAR-value"></td>
+            </tr>
+            <tr>
+              <td>BTC</td>
+              <td id="BTC-value"></td>
+            </tr>
+            <tr>
+              <td>ETH</td>
+              <td id="ETH-value"></td>
+            </tr>
+            <tr>
+              <td>TSLA</td>
+              <td id="TSLA-value"></td>
+            </tr>
+            <tr>
+              <td>EUR</td>
+              <td id="EUR-value"></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
+
     <div class="sign-out" style="display: none;">
-      <button class="btn btn-primary" style="background-color: #0072CE;">Sign Out</button>
+      <button class="btn btn-secondary">Sign Out</button>
     </div>
   
     <div class="sign-in" style="display: none;">
-      <p>You'll need to sign in to interact with the counter:</p>
-      <button class="btn btn-primary" style="background-color: #0072CE;">Sign In</button>
+      <p>Sign in to interact with the contract:</p>
+      <button class="btn btn-secondary">Sign In</button>
     </div>
 
   </div>
+
+  <div id="github-link">
+    <a href="https://github.com/redstone-finance/redstone-near-connectors" target="_blank">
+      <img width="50" src="assets/github-icon.svg" alt="github-icon" />
+    </a>
+  </div>
+
   <script src="./index.js" type="module"></script>
 </body>
 </html>

@@ -1,21 +1,17 @@
-# Count on NEAR 🧮
+# RedStone example on NEAR (JS contract)
 
-[![](https://img.shields.io/badge/⋈%20Examples-Basics-green)](https://docs.near.org/tutorials/welcome)
-
-Count on NEAR is a decentralized app that stores a simple counter, enabling to increment, decrement and reset it.
-
-![](https://docs.near.org/assets/images/count-on-near-banner-2df2978ef988be400aafd5e0f99878be.png)
+RedStone example on NEAR is a decentralized app that securely fetches prices of several assets.
 
 # What This Example Shows
 
-1. How to store, modify and retrieve information in the NEAR network.
-2. How to integrate a smart contract in a web frontend.
+1. How to integrate smart contracts with RedStone oracles
+2. How to prepare frontend for redstone-powered smart contracts
 
 <br />
 
 # Quickstart
 
-Clone this repository locally or [**open it in gitpod**](https://gitpod.io/#/github.com/near-examples/counter-js). Then follow these steps:
+Clone this repository locally. Then follow these steps:
 
 ### 1. Install Dependencies
 
@@ -51,5 +47,4 @@ npm start
 
 # Learn More
 
-1. Learn more about the contract through its [README](./contract/README.md).
-2. Check [**our documentation**](https://docs.near.org/develop/welcome).
+To learn more about integration with RedStone visit https://www.npmjs.com/package/redstone-near-connector-js

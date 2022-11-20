@@ -25,8 +25,8 @@
     "@near-wallet-selector/nightly-connect": "^7.0.0",
     "@near-wallet-selector/sender": "^7.0.0",
     "@near-wallet-selector/wallet-connect": "^7.0.0",
+    "ethers": "^5.7.2",
     "near-api-js": "^0.44.2",
-    "redstone-protocol": "^1.0.3",
-    "redstone-sdk": "^1.0.4"
+    "redstone-sdk": "^1.0.5"
   }
 }

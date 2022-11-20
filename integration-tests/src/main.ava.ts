@@ -67,7 +67,7 @@ test("can get oracle value", async (t) => {
   console.log({ oracleValueFromContract });
 });
 
-test("can do smth with oracle value", async (t) => {
+test("can do something with oracle value", async (t) => {
   const { alice, contract } = t.context.accounts;
 
   await alice.call(contract, "do_something_with_oracle_value", {

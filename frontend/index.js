@@ -1,9 +1,11 @@
 import 'regenerator-runtime/runtime'
 import { Wallet } from './near-wallet'
-import { RedstonePayload } from 'redstone-protocol'
 import redstoneSDK from 'redstone-sdk'
+import { arrayify } from 'ethers/lib/utils'
 
 const CONTRACT_ADDRESS = process.env.CONTRACT_NAME;
+const SYMBOLS = ['NEAR', 'BTC', 'ETH', 'TSLA', 'EUR'];
+const NEAR_TESTNET_EXPLORER = 'https://explorer.testnet.near.org';
 
 // When creating the wallet you can choose to create an access key, so the user
 // can skip signing non-payable methods when interacting with the contract
@@ -19,7 +21,7 @@ window.onload = async () => {
     signedOutFlow()
   }
 
-  updateUI()
+  setUpLinkToTheIntegratedContract();
 }
 
 // Log in and log out users using NEAR Wallet
@@ -32,92 +34,104 @@ function signedOutFlow() {
   document.querySelectorAll('.interact').forEach(button => button.disabled = true)
 }
 
-async function getRedstonePayload() {
-  const signedDataPackagesResponse = await redstoneSDK.requestDataPackages({
-    dataServiceId: "redstone-main-demo",
+async function getRedstonePayload(symbol) {
+  const redstoneDataGateways = [
+    'https://cache-service-direct-1.b.redstone.finance',
+    'https://d33trozg86ya9x.cloudfront.net',
+  ];
+  const redstonePayload = await redstoneSDK.requestRedstonePayload({
+    dataServiceId: 'redstone-main-demo',
     uniqueSignersCount: 1,
-    dataFeeds: ["NEAR"],
-  }, ["https://d33trozg86ya9x.cloudfront.net"]);
+    dataFeeds: [symbol],
+  }, redstoneDataGateways);
 
-  const unsignedMetadata = "manual-payload";
-  const redstonePayload = RedstonePayload.prepare(
-    signedDataPackagesResponse.NEAR, unsignedMetadata);
-  console.log({redstonePayload});
+  return redstonePayload;
 }
 
-// Displaying the signed in flow container and display counter
+async function getPriceFromNearContract(symbol) {
+  const redstonePayload = await getRedstonePayload(symbol);
+  const priceValue = await wallet.viewMethod({
+    contractId: CONTRACT_ADDRESS,
+    method: 'get_oracle_value',
+    args: {
+      redstone_payload: Object.values(arrayify(`0x${redstonePayload}`)),
+      symbol,
+    },
+  });
+  return priceValue / (10 ** 8);
+}
+
+async function getAllPricesFromNearContract() {
+  const resultPrices = {};
+  for (const symbol of SYMBOLS) {
+    console.log(`Getting price for ${symbol}`);
+    const price = await getPriceFromNearContract(symbol);
+    console.log(`Received price for ${symbol}: ${price}`);
+    resultPrices[symbol] = price;
+  }
+  return resultPrices;
+}
+
+// Displaying the signed in flow container and display oracle button
 async function signedInFlow() {
   document.querySelector('.sign-out').style.display = 'block';
-  document.querySelectorAll('.interact').forEach(button => button.disabled = false)
+  document.querySelectorAll('.wallet-required').forEach(el => el.style.display = 'flex');
 }
 
-// Buttons - Interact with the Smart contract
-document.querySelector('#plus').addEventListener('click', async () => {
-  resetUI();
-  await wallet.callMethod({contractId: CONTRACT_ADDRESS, method: "increment"});
-  await updateUI();
-});
-
-document.querySelector('#minus').addEventListener('click', async  () => {
-  resetUI();
-  await wallet.callMethod({contractId: CONTRACT_ADDRESS, method: "decrement"});
-  await updateUI();
-});
-document.querySelector('#a').addEventListener('click', async  () => {
-  resetUI();
-  await wallet.callMethod({contractId: CONTRACT_ADDRESS, method: "reset"});
-  await updateUI();
-});
-document.querySelector('#oracle-set').addEventListener('click', async  () => {
-  console.log("Setting oracle value");
-  resetUI();
-  await getRedstonePayload();
-  await wallet.callMethod({
-    contractId: CONTRACT_ADDRESS,
-    method: "set_oracle_value",
-    args: {"redstone_payload":[66,84,67,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,209,227,130,16,0,69,84,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,46,144,237,208,0,1,129,47,37,144,192,0,0,0,32,0,0,2,193,41,106,68,159,93,53,60,139,4,235,56,159,51,165,131,238,121,68,156,202,110,54,105,0,4,47,25,242,82,30,114,42,65,9,41,34,50,49,144,88,57,192,8,101,175,104,115,143,26,32,36,120,216,125,195,54,117,234,88,36,243,67,144,27,66,84,67,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,209,227,130,16,0,69,84,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,46,144,237,208,0,1,129,47,37,144,192,0,0,0,32,0,0,2,219,191,138,14,107,28,154,86,164,160,239,112,137,239,42,63,116,251,210,31,189,92,124,129,146,183,0,132,0,75,79,109,55,66,117,7,196,255,248,53,247,79,212,208,0,182,131,14,210,150,226,7,244,152,49,185,111,144,164,244,230,8,32,238,28,0,2,49,46,49,46,50,35,116,101,115,116,45,100,97,116,97,45,102,101,101,100,0,0,20,0,0,2,237,87,1,30,0,0]},
-  });
-  console.log("Oracle value set");
-  await updateUI();
-});
-
-// Update and Reset UI
-async function updateUI(){
-  // Original 
-  // let count = await wallet.viewMethod({contractId: CONTRACT_ADDRESS, method: "get_num"});
-
-  // Updated
-  let count = await wallet.viewMethod({contractId: CONTRACT_ADDRESS, method: "get_oracle_value"});
-  
-  document.querySelector('#show').classList.replace('loader','number');
-  document.querySelector('#show').innerText = count === undefined ? 'calculating...' : count;
-  document.querySelector('#left').classList.toggle('eye');
-
-  if (count >= 0) {
-    document.querySelector('.mouth').classList.replace('cry','smile');
-  } else {
-    document.querySelector('.mouth').classList.replace('smile','cry');
-  }
-
-  if (count > 20 || count < -20) {
-    document.querySelector('.tongue').style.display = 'block';
-  } else {
-    document.querySelector('.tongue').style.display = 'none';
+async function updateOracleData() {
+  try {
+    setLoading(true);
+    updateStatusMessage('Requesting oracle data...');
+    const prices = await getAllPricesFromNearContract();
+    await showNiceButMockStatuses();
+    setPricesInUI(prices);
+  } finally {
+    setLoading(false);
   }
 }
 
-function resetUI(){
-  document.querySelector('#show').classList.replace('number','loader');
-  document.querySelector('#show').innerText = '';
+function setPricesInUI(prices) {
+  document.getElementById('prices-container').style.display = 'flex';
+  for (const [symbol, value] of Object.entries(prices)) {
+    document.getElementById(`${symbol}-value`).innerHTML = value;
+  }
 }
 
-// Animations
-document.querySelector('#c').addEventListener('click', () => {
-  document.querySelector('#left').classList.toggle('eye');
-});
-document.querySelector('#b').addEventListener('click', () => {
-  document.querySelector('#right').classList.toggle('eye');
-});
-document.querySelector('#d').addEventListener('click', () => {
-  document.querySelector('.dot').classList.toggle('on');
+async function sleep(ms) {
+  return await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function updateStatusMessage(msg) {
+  const statusMsgEl = document.getElementById('status-msg-container');
+  statusMsgEl.innerHTML = msg;
+  statusMsgEl.style.display = 'block';
+}
+
+function setUpLinkToTheIntegratedContract() {
+  const linkEl = document.getElementById("integrated-contract-link");
+  linkEl.setAttribute('href', `${NEAR_TESTNET_EXPLORER}/accounts/${CONTRACT_ADDRESS}`);
+  linkEl.innerHTML = CONTRACT_ADDRESS;
+}
+
+// This function is used to improve the Demo experience
+// It shows status messages from the general steps, but in
+// practice these steps take way less time. We add `sleep` so
+// that users have time to read the messages
+async function showNiceButMockStatuses() {
+  updateStatusMessage('Fetching redstone payload...');
+  await sleep(2000);
+  updateStatusMessage('Redstone payload received');
+  await sleep(1000);
+  updateStatusMessage('Sending call to a NEAR smart contract...');
+  await sleep(2000);
+  updateStatusMessage('Received Oracle data from NEAR smart contract');
+}
+
+function setLoading(isVisible) {
+  document.getElementById('loader').style.display = (isVisible ? 'flex' : 'none');
+}
+
+// Handling oracle button click
+document.querySelector('#oracle-button').addEventListener('click', async () => {
+  await updateOracleData();
 });

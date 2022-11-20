@@ -4,14 +4,19 @@ import { getOracleValue } from "redstone-near-connector-js";
 const REDSTONE_MAIN_DEMO_SIGNER_PUB_KEY_HEX =
   "009dd87eb41d96ce8ad94aa22ea8b0ba4ac20c45e42f71726d6b180f93c3f298e333ae7591fe1c9d88234575639be9e81e35ba2fe5ad2c2260f07db49ccb9d0d";
 
-// TODO: implement
-function convertToBytes32(symbol: string): string {
-  // return symbol;
-  return "4254430000000000000000000000000000000000000000000000000000000000";
+function getDataFeedIdForSymbol(symbol: string): string {
+  const symbolToDataFeedId = {
+    NEAR: "4e45415200000000000000000000000000000000000000000000000000000000",
+    BTC: "4254430000000000000000000000000000000000000000000000000000000000",
+    ETH: "4554480000000000000000000000000000000000000000000000000000000000",
+    TSLA: "54534c4100000000000000000000000000000000000000000000000000000000",
+    EUR: "4555520000000000000000000000000000000000000000000000000000000000",
+  };
+  return symbolToDataFeedId[symbol];
 }
 
 function getOracleValueForSymbol(symbol: string, redstonePayload: Uint8Array): bigint {
-  const dataFeedId = convertToBytes32(symbol);
+  const dataFeedId = getDataFeedIdForSymbol(symbol);
   return getOracleValue({
     dataFeedId,
     uniqueSignersThreshold: 1,
